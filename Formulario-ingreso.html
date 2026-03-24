@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Cargar movimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f11;
+  --surface: #18181c;
+  --surface2: #202028;
+  --surface3: #26262f;
+  --border: #2a2a35;
+  --text: #f0ede6;
+  --text2: #9a9690;
+  --text3: #5a5860;
+  --accent: #c8a96e;
+  --accent2: #e8c98e;
+  --green: #4caf82;
+  --red: #e05555;
+  --blue: #5b9cf6;
+  --purple: #a57cf0;
+  --orange: #e8833a;
+  --yellow: #e8c060;
+  --key-h: 64px;
+  --radius: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  overscroll-behavior: none;
+}
+
+/* ── LAYOUT ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── TOP BAR ── */
+#topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.topbar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+
+.topbar-date {
+  font-size: 12px;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface2);
+  transition: border-color .15s;
+}
+.topbar-date:hover { border-color: var(--accent); color: var(--text2); }
+.topbar-date input[type="date"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* ── TAB BAR ── */
+#tabbar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all .15s;
+  border-bottom: 2px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 500;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── PANELS ── */
+.panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.panel.active { display: flex; }
+
+/* ── FORM PANEL ── */
+#panel-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── AMOUNT DISPLAY ── */
+#amount-display {
+  background: var(--surface);
+  padding: 20px 24px 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.amount-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.amount-symbol {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--text3);
+}
+
+#amount-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -1px;
+  transition: color .2s;
+  word-break: break-all;
+  min-width: 60px;
+}
+#amount-value.has-value { color: var(--accent2); }
+#amount-value.zero { color: var(--text3); }
+
+.amount-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ITEM FIELD inline */
+#item-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 4px 0;
+  outline: none;
+  transition: border-color .15s;
+}
+#item-input:focus { border-bottom-color: var(--accent); color: var(--text); }
+#item-input::placeholder { color: var(--text3); }
+
+/* ── CATEGORY SCROLL ZONE ── */
+#cat-zone {
+  flex-shrink: 0;
+  padding: 14px 16px 10px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-group-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.cat-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+
+.cat-tab-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.cat-tab-btn.active { background: rgba(200,169,110,.15); border-color: var(--accent); color: var(--accent); }
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.cat-btn {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .18s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Sans', sans-serif;
+}
+.cat-btn:active { transform: scale(.94); }
+.cat-btn.selected {
+  border-color: var(--accent);
+  background: rgba(200,169,110,.12);
+}
+.cat-btn .cat-icon { font-size: 18px; line-height: 1; }
+.cat-btn .cat-label { font-size: 10px; color: var(--text2); line-height: 1.2; }
+.cat-btn.selected .cat-label { color: var(--accent); }
+
+/* ── NUMPAD ── */
+#numpad {
+  flex-shrink: 0;
+  padding: 10px 12px 12px;
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.key {
+  height: var(--key-h);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .1s;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+.key:active { transform: scale(.93); background: var(--surface3); }
+.key.key-action {
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 16px;
+  font-weight: 400;
+}
+.key.key-delete {
+  background: rgba(224,85,85,.1);
+  border-color: rgba(224,85,85,.3);
+  color: var(--red);
+  font-size: 20px;
+}
+.key.key-submit {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0f0f11;
+  font-size: 16px;
+  font-weight: 700;
+  grid-column: span 3;
+  height: 56px;
+  border-radius: var(--radius);
+  letter-spacing: 0.5px;
+  font-family: 'DM Sans', sans-serif;
+  text-transform: uppercase;
+}
+.key.key-submit:active { opacity: .85; }
+.key.key-submit:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Ripple */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  width: 80px; height: 80px;
+  margin-left: -40px; margin-top: -40px;
+  animation: rippleAnim .4s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim { from { opacity:1; transform:scale(0); } to { opacity:0; transform:scale(2.5); } }
+
+/* ── HISTORY PANEL ── */
+#panel-history {
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.history-day-group { margin-bottom: 20px; }
+.history-day-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.history-day-label span:last-child { color: var(--text2); }
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  gap: 12px;
+  transition: border-color .15s;
+  animation: fadeSlide .2s ease both;
+}
+@keyframes fadeSlide { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.hist-item:hover { border-color: var(--text3); }
+
+.hist-cat-dot {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.hist-info { flex: 1; min-width: 0; }
+.hist-desc { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-cat { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.hist-amount {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.hist-del {
+  background: none; border: none; color: var(--text3); cursor: pointer;
+  padding: 6px; border-radius: 6px; font-size: 13px; transition: all .15s;
+}
+.hist-del:hover { color: var(--red); background: rgba(224,85,85,.1); }
+
+/* empty state */
+.empty-hist {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-hist .empty-icon { font-size: 48px; margin-bottom: 12px; opacity:.4; }
+.empty-hist p { font-size: 14px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  transition: all .25s;
+  white-space: nowrap;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── FEEDBACK ANIMATION ── */
+@keyframes successPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.success-flash { animation: successPop .3s ease; }
+
+/* ── DATE PICKER OVERLAY ── */
+#date-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+#date-overlay.open { display: flex; }
+.date-sheet {
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+}
+.date-sheet h3 { font-family:'Playfair Display',serif; font-size:16px; margin-bottom:16px; }
+.date-sheet input[type="date"] {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  margin-bottom: 14px;
+}
+.date-sheet input:focus { border-color: var(--accent); }
+.date-shortcuts { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.date-short-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.date-short-btn:hover, .date-short-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,169,110,.1); }
+
+/* ── FRECUENTES badge ── */
+.freq-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 1.5px solid var(--bg);
+}
+
+/* ── PC fallback ── */
+@media (min-width: 480px) {
+  #app {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    box-shadow: 0 0 60px rgba(0,0,0,.5);
+  }
+  body { background: #090909; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="topbar-title">◈ Cargar movimiento</div>
+    <div class="topbar-date" onclick="openDatePicker()">
+      <span>📅</span>
+      <span id="date-label">Hoy</span>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div id="tabbar">
+    <div class="tab active" data-panel="form" onclick="switchTab('form')">Cargar</div>
+    <div class="tab" data-panel="history" onclick="switchTab('history')">Historial</div>
+  </div>
+
+  <!-- PANEL: FORMULARIO -->
+  <div class="panel active" id="panel-form">
+
+    <!-- Monto display -->
+    <div id="amount-display">
+      <div class="amount-row">
+        <span class="amount-symbol" id="currency-symbol">$</span>
+        <span id="amount-value" class="zero">0</span>
+      </div>
+      <div class="amount-meta">
+        <input id="item-input" type="text" placeholder="Descripción del gasto..." maxlength="60" autocomplete="off" autocorrect="off">
+      </div>
+    </div>
+
+    <!-- Categorías -->
+    <div id="cat-zone">
+      <div class="cat-tabs" id="cat-tabs"></div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+    <!-- Numpad -->
+    <div id="numpad">
+      <div class="key" data-k="7" onclick="keyPress('7',this)">7</div>
+      <div class="key" data-k="8" onclick="keyPress('8',this)">8</div>
+      <div class="key" data-k="9" onclick="keyPress('9',this)">9</div>
+      <div class="key" data-k="4" onclick="keyPress('4',this)">4</div>
+      <div class="key" data-k="5" onclick="keyPress('5',this)">5</div>
+      <div class="key" data-k="6" onclick="keyPress('6',this)">6</div>
+      <div class="key" data-k="1" onclick="keyPress('1',this)">1</div>
+      <div class="key" data-k="2" onclick="keyPress('2',this)">2</div>
+      <div class="key" data-k="3" onclick="keyPress('3',this)">3</div>
+      <div class="key key-action" data-k="." onclick="keyPress('.',this)">⁚</div>
+      <div class="key" data-k="0" onclick="keyPress('0',this)">0</div>
+      <div class="key key-delete" onclick="keyDelete(this)">⌫</div>
+      <div class="key key-submit" id="btn-submit" onclick="submitMovimiento()">Guardar</div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: HISTORIAL -->
+  <div class="panel" id="panel-history">
+    <div id="history-content"></div>
+  </div>
+
+</div>
+
+<!-- DATE PICKER OVERLAY -->
+<div id="date-overlay">
+  <div class="date-sheet">
+    <h3>Selecionar fecha</h3>
+    <input type="date" id="date-picker-input" oninput="datePickerChange()">
+    <div class="date-shortcuts">
+      <button class="date-short-btn active" onclick="setDateShortcut(0, this)">Hoy</button>
+      <button class="date-short-btn" onclick="setDateShortcut(-1, this)">Ayer</button>
+      <button class="date-short-btn" onclick="setDateShortcut(-2, this)">Antier</button>
+    </div>
+    <button onclick="closeDatePicker()" style="width:100%;background:var(--accent);color:#0f0f11;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer">Confirmar</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span id="toast-icon"></span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+function load(k, d) { try { const v=localStorage.getItem(k); return v?JSON.parse(v):d; } catch { return d; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
+const cfg = load('tb_config', {currency:'ARS', name:'Usuario'});
+const CURRENCY_SYMBOLS = {ARS:'$', MXN:'$', PEN:'S/', CLP:'$', COP:'$', USD:'US$'};
+const SYM = CURRENCY_SYMBOLS[cfg.currency] || '$';
+document.getElementById('currency-symbol').textContent = SYM;
+
+const CATS = {
+  ingresos: [
+    {k:'Sueldo',          icon:'💼', label:'Sueldo'},
+    {k:'Ingresos extraordinarios', icon:'✨', label:'Extra'},
+    {k:'Intereses',       icon:'📈', label:'Intereses'},
+  ],
+  ahorros: [
+    {k:'Ahorros',         icon:'🏦', label:'Ahorros'},
+  ],
+  regulares: [
+    {k:'Casa',            icon:'🏠', label:'Casa'},
+    {k:'Transporte',      icon:'🚌', label:'Transporte'},
+    {k:'Comida',          icon:'🛒', label:'Comida'},
+    {k:'Educación',       icon:'📚', label:'Educación'},
+    {k:'Equipo',          icon:'💻', label:'Equipo'},
+    {k:'Necesidades',     icon:'🧴', label:'Necesidades'},
+    {k:'Salud',           icon:'🏥', label:'Salud'},
+    {k:'Cuotas',          icon:'💳', label:'Cuotas'},
+  ],
+  inusuales: [
+    {k:'Inusuales',       icon:'🎲', label:'Inusuales'},
+    {k:'Actividades',     icon:'🎭', label:'Actividades'},
+  ],
+};
+
+const CAT_COLORS = {
+  Sueldo:'rgba(76,175,130,.2)', 'Ingresos extraordinarios':'rgba(76,175,130,.2)', Intereses:'rgba(76,175,130,.2)',
+  Ahorros:'rgba(91,156,246,.2)',
+  Casa:'rgba(165,124,240,.2)', Transporte:'rgba(91,156,246,.2)', Comida:'rgba(232,131,58,.2)',
+  Educación:'rgba(200,169,110,.2)', Equipo:'rgba(91,156,246,.2)', Necesidades:'rgba(200,169,110,.15)',
+  Salud:'rgba(224,85,85,.2)', Cuotas:'rgba(224,85,85,.15)',
+  Inusuales:'rgba(232,196,96,.2)', Actividades:'rgba(165,124,240,.2)',
+};
+
+const INCOME_CATS = ['Sueldo','Ingresos extraordinarios','Intereses'];
+const TAB_LABELS = { ingresos:'Ingresos', ahorros:'Ahorros', regulares:'Regulares', inusuales:'Inusuales' };
+
+let amountStr   = '';
+let selectedCat = 'Comida';
+let selectedGroup = 'regulares';
+let selectedDate = todayStr();
+let movs        = load('tb_movs', []);
+let frecuentes  = load('tb_freq', {});  // {cat: count}
+
+// ══════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function fmtDate(d) {
+  const today = todayStr();
+  const yest  = offsetDate(-1);
+  if (d === today) return 'Hoy';
+  if (d === yest)  return 'Ayer';
+  const [y,m,dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+
+function offsetDate(n) {
+  const d = new Date(); d.setDate(d.getDate()+n);
+  return d.toISOString().split('T')[0];
+}
+
+function fmtAmount(n) {
+  return SYM + Math.abs(n).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+function rippleEffect(el, e) {
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = el.getBoundingClientRect();
+  r.style.left = (e.clientX - rect.left) + 'px';
+  r.style.top  = (e.clientY - rect.top)  + 'px';
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+function switchTab(panel) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.panel === panel));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + panel));
+  if (panel === 'history') renderHistory();
+}
+
+// ══════════════════════════════════════════════════
+//  NUMPAD
+// ══════════════════════════════════════════════════
+function keyPress(k, el) {
+  if (el && event) rippleEffect(el, event);
+
+  if (k === '.') {
+    if (amountStr.includes('.')) return;
+    if (amountStr === '') amountStr = '0';
+    amountStr += '.';
+    renderAmount();
+    return;
+  }
+  // Max 2 decimals
+  if (amountStr.includes('.') && amountStr.split('.')[1]?.length >= 2) return;
+  // Prevent leading zeros
+  if (amountStr === '0' && k !== '.') { amountStr = k; }
+  else {
+    if (amountStr.length >= 10) return;
+    amountStr += k;
+  }
+  renderAmount();
+}
+
+function keyDelete(el) {
+  if (el && event) rippleEffect(el, event);
+  amountStr = amountStr.slice(0, -1);
+  renderAmount();
+}
+
+// Keyboard physical support
+document.addEventListener('keydown', e => {
+  if (['0','1','2','3','4','5','6','7','8','9'].includes(e.key)) keyPress(e.key, null);
+  else if (e.key === '.') keyPress('.', null);
+  else if (e.key === 'Backspace') keyDelete(null);
+  else if (e.key === 'Enter') submitMovimiento();
+});
+
+function renderAmount() {
+  const el = document.getElementById('amount-value');
+  const numStr = amountStr || '0';
+  const num = parseFloat(numStr) || 0;
+
+  // Format with thousands separator while preserving trailing dot/decimals being typed
+  let display;
+  if (amountStr === '' || amountStr === '0') {
+    display = '0';
+    el.className = 'zero';
+  } else if (amountStr.endsWith('.')) {
+    display = parseInt(amountStr).toLocaleString('es-AR') + ',';
+    el.className = 'has-value';
+  } else if (amountStr.includes('.')) {
+    const [int, dec] = amountStr.split('.');
+    display = parseInt(int).toLocaleString('es-AR') + ',' + dec;
+    el.className = 'has-value';
+  } else {
+    display = parseInt(amountStr).toLocaleString('es-AR');
+    el.className = 'has-value';
+  }
+  el.textContent = display;
+}
+
+// ══════════════════════════════════════════════════
+//  CATEGORY TABS & GRID
+// ══════════════════════════════════════════════════
+function renderCatTabs() {
+  const container = document.getElementById('cat-tabs');
+  container.innerHTML = Object.keys(CATS).map(g =>
+    `<button class="cat-tab-btn ${g===selectedGroup?'active':''}" onclick="selectGroup('${g}')">${TAB_LABELS[g]}</button>`
+  ).join('');
+}
+
+function selectGroup(g) {
+  selectedGroup = g;
+  // Auto-select first cat of group if current selection not in group
+  const groupCatKeys = CATS[g].map(c=>c.k);
+  if (!groupCatKeys.includes(selectedCat)) {
+    selectedCat = CATS[g][0].k;
+  }
+  renderCatTabs();
+  renderCatGrid();
+}
+
+function selectCat(k) {
+  selectedCat = k;
+  renderCatGrid();
+  // Haptic if available
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+function getTopFrequentes(g, n=2) {
+  const groupKeys = CATS[g].map(c=>c.k);
+  return Object.entries(frecuentes)
+    .filter(([k])=>groupKeys.includes(k))
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,n)
+    .map(([k])=>k);
+}
+
+function renderCatGrid() {
+  const container = document.getElementById('cat-grid');
+  const cats = CATS[selectedGroup];
+  const topFreq = getTopFrequentes(selectedGroup);
+
+  container.innerHTML = cats.map(c => {
+    const isFreq = topFreq.includes(c.k);
+    const isSel  = c.k === selectedCat;
+    return `<button class="cat-btn ${isSel?'selected':''}" onclick="selectCat('${c.k}')">
+      ${isFreq ? '<div class="freq-badge"></div>' : ''}
+      <span class="cat-icon">${c.icon}</span>
+      <span class="cat-label">${c.label}</span>
+    </button>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  DATE
+// ══════════════════════════════════════════════════
+function updateDateLabel() {
+  document.getElementById('date-label').textContent = fmtDate(selectedDate);
+}
+
+function openDatePicker() {
+  document.getElementById('date-picker-input').value = selectedDate;
+  document.getElementById('date-overlay').classList.add('open');
+  // sync shortcut buttons
+  document.querySelectorAll('.date-short-btn').forEach(b => b.classList.remove('active'));
+  if (selectedDate === todayStr()) document.querySelectorAll('.date-short-btn')[0].classList.add('active');
+  else if (selectedDate === offsetDate(-1)) document.querySelectorAll('.date-short-btn')[1].classList.add('active');
+  else if (selectedDate === offsetDate(-2)) document.querySelectorAll('.date-short-btn')[2].classList.add('active');
+}
+
+function closeDatePicker() {
+  document.getElementById('date-overlay').classList.remove('open');
+}
+
+function setDateShortcut(offset, btn) {
+  selectedDate = offsetDate(offset);
+  document.getElementById('date-picker-input').value = selectedDate;
+  document.querySelectorAll('.date-short-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateDateLabel();
+}
+
+function datePickerChange() {
+  selectedDate = document.getElementById('date-picker-input').value;
+  document.querySelectorAll('.date-short-btn').forEach(b => b.classList.remove('active'));
+  if (selectedDate === todayStr()) document.querySelectorAll('.date-short-btn')[0].classList.add('active');
+  updateDateLabel();
+}
+
+document.getElementById('date-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('date-overlay')) closeDatePicker();
+});
+
+// ══════════════════════════════════════════════════
+//  SUBMIT
+// ══════════════════════════════════════════════════
+function submitMovimiento() {
+  const rawAmount = parseFloat(amountStr) || 0;
+  if (rawAmount <= 0) {
+    shakeAmount();
+    showToast('⚠️', 'Ingresá un monto');
+    return;
+  }
+
+  const item = document.getElementById('item-input').value.trim() || selectedCat;
+  const isIngreso = INCOME_CATS.includes(selectedCat);
+  const precio = isIngreso ? rawAmount : -rawAmount;
+
+  const mov = {
+    id: uid(),
+    fecha: selectedDate,
+    precio,
+    item,
+    categoria: selectedCat,
+  };
+
+  // Save
+  movs = load('tb_movs', []);
+  movs.push(mov);
+  save('tb_movs', movs);
+
+  // Update frecuentes
+  frecuentes[selectedCat] = (frecuentes[selectedCat] || 0) + 1;
+  save('tb_freq', frecuentes);
+
+  // Feedback
+  showToast('✓', `${item} — ${fmtAmount(rawAmount)} guardado`);
+  successAnimation();
+
+  // Reset
+  amountStr = '';
+  renderAmount();
+  document.getElementById('item-input').value = '';
+
+  // Keep same category, just reset amount
+}
+
+function shakeAmount() {
+  const el = document.getElementById('amount-value');
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'shake .3s ease';
+}
+
+function successAnimation() {
+  const el = document.getElementById('amount-display');
+  el.classList.add('success-flash');
+  setTimeout(() => el.classList.remove('success-flash'), 400);
+  if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+}
+
+// ══════════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════════
+function renderHistory() {
+  movs = load('tb_movs', []);
+  const container = document.getElementById('history-content');
+
+  const recent = [...movs]
+    .sort((a,b) => b.fecha.localeCompare(a.fecha) || b.id.localeCompare(a.id))
+    .slice(0, 60);
+
+  if (!recent.length) {
+    container.innerHTML = `<div class="empty-hist"><div class="empty-icon">📭</div><p>Sin movimientos aún</p></div>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  recent.forEach(m => {
+    if (!grouped[m.fecha]) grouped[m.fecha] = [];
+    grouped[m.fecha].push(m);
+  });
+
+  let html = '';
+  Object.entries(grouped).forEach(([fecha, items]) => {
+    const dayTotal = items.reduce((s,m) => s + m.precio, 0);
+    const allCats = [...CATS.ingresos, ...CATS.ahorros, ...CATS.regulares, ...CATS.inusuales];
+
+    html += `<div class="history-day-group">
+      <div class="history-day-label">
+        <span>${fmtDate(fecha)}</span>
+        <span style="color:${dayTotal>=0?'var(--green)':'var(--red)'}">${dayTotal>=0?'+':''}${fmtAmount(dayTotal)}</span>
+      </div>`;
+
+    items.forEach(m => {
+      const catData = allCats.find(c=>c.k===m.categoria) || {icon:'💰', label:m.categoria};
+      const color = CAT_COLORS[m.categoria] || 'rgba(255,255,255,.08)';
+      html += `<div class="hist-item" id="hist-${m.id}">
+        <div class="hist-cat-dot" style="background:${color}">${catData.icon}</div>
+        <div class="hist-info">
+          <div class="hist-desc">${m.item}</div>
+          <div class="hist-cat">${m.categoria}</div>
+        </div>
+        <div class="hist-amount" style="color:${m.precio>0?'var(--green)':'var(--red)'}">${m.precio>0?'+':'−'}${fmtAmount(m.precio)}</div>
+        <button class="hist-del" onclick="deleteHistItem('${m.id}')">✕</button>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function deleteHistItem(id) {
+  movs = load('tb_movs', []);
+  movs = movs.filter(m => m.id !== id);
+  save('tb_movs', movs);
+  const el = document.getElementById('hist-'+id);
+  if (el) { el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='all .25s'; setTimeout(()=>el.remove(),250); }
+  showToast('🗑️', 'Movimiento eliminado');
+}
+
+// ══════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════
+let toastTimer;
+function showToast(icon, msg) {
+  clearTimeout(toastTimer);
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast').classList.add('show');
+  toastTimer = setTimeout(() => document.getElementById('toast').classList.remove('show'), 2200);
+}
+
+// ══════════════════════════════════════════════════
+//  SHAKE KEYFRAME (dynamic)
+// ══════════════════════════════════════════════════
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }`;
+document.head.appendChild(shakeStyle);
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+function init() {
+  updateDateLabel();
+  renderCatTabs();
+  renderCatGrid();
+  renderAmount();
+
+  // Focus item input on load for PC
+  if (window.innerWidth > 480) {
+    document.getElementById('item-input').focus();
+  }
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? '🌅 Buenos días' : hour < 19 ? '☀️ Buenas tardes' : '🌙 Buenas noches';
+  const name = cfg.name || '';
+  if (name) showToast(greet.split(' ')[0], `${greet.slice(2)}, ${name}`);
+}
+
+init();
+</script>
+</body>
+</html>
