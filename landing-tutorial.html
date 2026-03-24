@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tablero Personal — Tu sistema de vida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#08080a;
+  --surface:#0f0f13;
+  --surface2:#15151a;
+  --border:rgba(255,255,255,.07);
+  --text:#f0ede6;
+  --text2:#a8a49e;
+  --text3:#5a5754;
+  --gold:#c8a96e;
+  --gold2:#e8c98e;
+  --green:#5eb88a;
+  --blue:#6a9fd8;
+  --red:#e0604a;
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.4;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(8,8,10,.8);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:400;
+  color:var(--gold);letter-spacing:.06em;
+}
+.nav-logo span{color:var(--text3);font-style:italic;font-size:13px;margin-left:8px;}
+.nav-cta{
+  background:var(--gold);color:#08080a;
+  border:none;padding:10px 24px;
+  border-radius:2px;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .2s;
+  letter-spacing:.04em;
+  text-decoration:none;display:inline-block;
+}
+.nav-cta:hover{background:var(--gold2);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:120px 40px 80px;
+  position:relative;
+  text-align:center;
+}
+.hero-glow{
+  position:absolute;top:20%;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;
+  background:radial-gradient(circle, rgba(200,169,110,.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:760px;position:relative;z-index:1;}
+.hero-tag{
+  display:inline-block;
+  border:1px solid rgba(200,169,110,.25);
+  color:var(--gold);font-size:11px;
+  letter-spacing:.18em;text-transform:uppercase;
+  padding:6px 16px;border-radius:20px;
+  margin-bottom:28px;
+  background:rgba(200,169,110,.05);
+}
+.hero-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(42px,7vw,80px);
+  font-weight:300;line-height:1.1;
+  color:var(--text);margin-bottom:12px;
+}
+.hero-titulo em{font-style:italic;color:var(--gold);}
+.hero-sub{
+  font-size:clamp(16px,2.5vw,20px);
+  color:var(--text2);font-weight:300;
+  max-width:560px;margin:0 auto 40px;
+  line-height:1.7;
+}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:60px;}
+.btn-primary{
+  background:var(--gold);color:#08080a;
+  border:none;padding:16px 40px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;
+  cursor:pointer;border-radius:2px;
+  transition:all .25s;letter-spacing:.03em;
+  text-decoration:none;display:inline-block;
+}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,169,110,.2);}
+.btn-secondary{
+  background:transparent;color:var(--text2);
+  border:1px solid var(--border);padding:16px 40px;
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  cursor:pointer;border-radius:2px;
+  transition:all .25s;
+  text-decoration:none;display:inline-block;
+}
+.btn-secondary:hover{border-color:rgba(200,169,110,.3);color:var(--gold);}
+
+.hero-stats{
+  display:flex;gap:40px;justify-content:center;flex-wrap:wrap;
+  padding-top:40px;
+  border-top:1px solid var(--border);
+}
+.hero-stat{text-align:center;}
+.hero-stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;font-weight:300;color:var(--gold);
+}
+.hero-stat-label{font-size:12px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+
+/* ── MOCKUP ── */
+.mockup-section{
+  padding:80px 40px;
+  max-width:1100px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.mockup-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+}
+.mockup-bar{
+  background:var(--surface2);
+  padding:12px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border);
+}
+.mockup-dot{width:10px;height:10px;border-radius:50%;}
+.mockup-url{
+  flex:1;background:rgba(255,255,255,.04);
+  border-radius:4px;padding:4px 12px;
+  font-size:11px;color:var(--text3);
+  margin:0 12px;
+}
+.mockup-screen{
+  display:grid;grid-template-columns:200px 1fr;
+  min-height:360px;
+}
+.mockup-sidebar{
+  background:#0c0c10;border-right:1px solid var(--border);
+  padding:16px 12px;display:flex;flex-direction:column;gap:4px;
+}
+.mockup-logo{
+  font-family:'Cormorant Garamond',serif;font-size:15px;
+  color:var(--gold);padding:8px 8px 16px;
+  border-bottom:1px solid var(--border);margin-bottom:8px;
+}
+.mockup-nav-item{
+  padding:8px 12px;border-radius:6px;font-size:12px;
+  color:var(--text3);display:flex;align-items:center;gap:8px;
+}
+.mockup-nav-item.on{background:rgba(200,169,110,.08);color:var(--gold);}
+.mockup-nav-section{font-size:9px;letter-spacing:.12em;color:var(--text3);padding:12px 12px 4px;text-transform:uppercase;}
+.mockup-main{padding:24px;display:flex;flex-direction:column;gap:16px;}
+.mockup-header{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:4px;}
+.mockup-date{font-size:11px;color:var(--text3);}
+.mockup-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.mockup-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+}
+.mockup-card-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.mockup-card-val{font-family:'Cormorant Garamond',serif;font-size:20px;}
+.mockup-card-val.pos{color:var(--green);}
+.mockup-card-val.acc{color:var(--gold);}
+.mockup-bar-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.mockup-bar-label{font-size:11px;color:var(--text2);width:80px;flex-shrink:0;}
+.mockup-bar-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.mockup-bar-fill{height:100%;border-radius:3px;}
+
+/* ── FEATURES ── */
+.features-section{
+  padding:100px 40px;
+  max-width:1100px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.section-tag{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.section-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,5vw,52px);font-weight:300;
+  color:var(--text);margin-bottom:16px;line-height:1.2;
+}
+.section-titulo em{font-style:italic;color:var(--gold);}
+.section-sub{font-size:16px;color:var(--text2);max-width:500px;line-height:1.7;margin-bottom:60px;}
+
+.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);}
+.feature-item{
+  background:var(--bg);padding:36px 32px;
+  transition:background .2s;
+}
+.feature-item:hover{background:var(--surface);}
+.feature-icon{
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;margin-bottom:20px;
+}
+.feature-titulo{font-size:17px;font-weight:500;color:var(--text);margin-bottom:8px;}
+.feature-desc{font-size:14px;color:var(--text2);line-height:1.65;}
+
+/* ── MÓDULOS ── */
+.modulos-section{
+  padding:100px 40px;
+  position:relative;z-index:1;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.modulos-inner{max-width:1100px;margin:0 auto;}
+.modulos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:48px;}
+.modulo-card{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:24px 20px;
+  transition:all .2s;
+}
+.modulo-card:hover{border-color:rgba(200,169,110,.25);transform:translateY(-3px);}
+.modulo-icon{font-size:24px;margin-bottom:14px;}
+.modulo-nombre{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.modulo-desc{font-size:13px;color:var(--text3);line-height:1.55;}
+
+/* ── TUTORIAL ── */
+.tutorial-section{padding:100px 40px;position:relative;z-index:1;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.tutorial-inner{max-width:1100px;margin:0 auto;}
+.tut-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tut-tab{
+  padding:10px 18px;background:transparent;border:none;
+  color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+.tut-tab:hover{color:var(--text2);}
+.tut-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tut-panels{min-height:480px;}
+.tut-panel{display:none;}
+.tut-panel.active{display:block;}
+.tut-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:40px 0;}
+.tut-modulo-tag{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.tut-titulo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--text);line-height:1.2;margin-bottom:16px;}
+.tut-desc{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:24px;}
+.tut-features{display:flex;flex-direction:column;gap:8px;}
+.tut-feat{font-size:13px;color:var(--text2);padding-left:4px;}
+
+/* Mockup vars */
+.tut-mockup{--tgold:#c8a96e;--tgreen:#5eb88a;--tblue:#6a9fd8;--tred:#e0604a;
+  background:#0c0c10;border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  padding:20px;font-size:12px;color:#a8a49e;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);}
+
+/* Shared mockup components */
+.tmock-header{margin-bottom:14px;}
+.tmock-titulo{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f0ede6;}
+.tmock-fecha{font-size:11px;color:#5a5754;margin-top:2px;}
+.tmock-insights{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.tmock-insight{font-size:11px;padding:7px 10px;border-radius:6px;}
+.tmock-insight.verde{background:rgba(94,184,138,.08);border:1px solid rgba(94,184,138,.15);color:var(--tgreen);}
+.tmock-insight.azul{background:rgba(106,159,216,.08);border:1px solid rgba(106,159,216,.15);color:var(--tblue);}
+.tmock-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.tmock-stat{background:#15151a;border-radius:6px;padding:10px;}
+.tmock-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#5a5754;margin-bottom:4px;}
+.tmock-stat-v{font-family:'Cormorant Garamond',serif;font-size:18px;}
+.tmock-stat-v.gold{color:var(--tgold);}
+.tmock-stat-v.green{color:var(--tgreen);}
+.tmock-section-title{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#5a5754;margin-bottom:8px;}
+.tmock-bar-row,.tmock-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;}
+.tmock-bar-row span:first-child,.tmock-cat-row span:first-child{width:80px;flex-shrink:0;color:#a8a49e;}
+.tmock-bar-row span:last-child,.tmock-cat-row span:last-child{width:36px;text-align:right;flex-shrink:0;color:#5a5754;}
+.tmock-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.tmock-fill{height:100%;border-radius:3px;}
+
+/* Metas mockup */
+.tmock-meta-card{background:#15151a;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:14px;}
+.tmock-meta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.tmock-meta-nombre{font-size:13px;color:#f0ede6;}
+.tmock-plazo{font-size:10px;padding:3px 8px;border-radius:20px;}
+.tmock-progress-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.tmock-progress-fill{height:100%;border-radius:3px;}
+.tmock-meta-footer{display:flex;justify-content:space-between;font-size:10px;color:#5a5754;margin-bottom:10px;}
+.tmock-hitos{display:flex;flex-direction:column;gap:5px;}
+.tmock-hito{font-size:11px;color:#5a5754;padding:4px 0;}
+.tmock-hito.done{color:#5eb88a;}
+
+/* Finanzas mockup */
+.tmock-fin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.tmock-fin-stat{background:#15151a;border-radius:6px;padding:10px;}
+.tmock-fin-l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#5a5754;margin-bottom:4px;}
+.tmock-fin-v{font-family:'Cormorant Garamond',serif;font-size:16px;}
+.tmock-movs{margin-top:10px;border-top:1px solid rgba(255,255,255,.04);padding-top:8px;}
+.tmock-mov{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid rgba(255,255,255,.03);}
+
+/* Presupuesto mockup */
+.tmock-pvr{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.tmock-pvr-nombre{width:80px;flex-shrink:0;color:#a8a49e;}
+.tmock-pvr-barras{flex:1;display:flex;flex-direction:column;gap:3px;}
+.tmock-pvr-bar{height:5px;border-radius:3px;}
+.tmock-pvr-bar.real{background:var(--tblue);}
+.tmock-pvr-bar.presup{background:rgba(255,255,255,.08);}
+.tmock-pvr-pct{width:36px;text-align:right;font-size:11px;font-weight:500;}
+.tmock-pvr-pct.ok{color:var(--tgreen);}
+.tmock-pvr-pct.over{color:var(--tred);}
+.tmock-total-card{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:8px;margin-top:10px;background:rgba(94,184,138,.06);border:1px solid rgba(94,184,138,.15);font-size:12px;}
+
+/* Inversiones mockup */
+.tmock-inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.tmock-inv-nombre{font-size:14px;color:#f0ede6;}
+.tmock-inv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.tmock-btn{padding:5px 10px;border-radius:4px;border:none;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.tmock-btn.green{background:rgba(94,184,138,.1);color:var(--tgreen);border:1px solid rgba(94,184,138,.2);}
+.tmock-btn.red{background:rgba(224,96,74,.08);color:var(--tred);border:1px solid rgba(224,96,74,.2);}
+.tmock-tabla{width:100%;border-collapse:collapse;font-size:11px;}
+.tmock-tabla th{text-align:left;padding:5px 6px;color:#5a5754;border-bottom:1px solid rgba(255,255,255,.06);font-weight:400;}
+.tmock-tabla td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.03);color:#a8a49e;}
+
+/* Deudas mockup */
+.tmock-deuda-card{background:#15151a;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:14px;}
+.tmock-deuda-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.tmock-deuda-nombre{font-size:14px;color:#f0ede6;}
+.tmock-deuda-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;font-size:12px;}
+
+/* Chat mockup */
+.tmock-chat{display:flex;flex-direction:column;gap:12px;}
+.tmock-msg{display:flex;align-items:flex-start;gap:10px;}
+.tmock-msg.user{flex-direction:row-reverse;}
+.tmock-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:rgba(200,169,110,.1);color:var(--tgold);border:1px solid rgba(200,169,110,.2);}
+.tmock-avatar.user{background:rgba(106,159,216,.1);color:var(--tblue);border-color:rgba(106,159,216,.2);}
+.tmock-bubble{padding:10px 13px;border-radius:10px;font-size:12px;line-height:1.6;max-width:85%;}
+.tmock-bubble.ia{background:#15151a;border:1px solid rgba(255,255,255,.06);color:#a8a49e;border-radius:3px 10px 10px 10px;}
+.tmock-bubble.user{background:rgba(106,159,216,.08);border:1px solid rgba(106,159,216,.12);color:#a8a49e;border-radius:10px 3px 10px 10px;}
+.tmock-bubble strong{color:#f0ede6;}
+
+@media(max-width:768px){
+  .tut-layout{grid-template-columns:1fr;}
+  .tut-mockup{order:-1;}
+  .tutorial-section{padding:60px 20px;}
+  .tut-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:0;}
+  .tut-tab{white-space:nowrap;}
+}
+
+/* ── PARA QUIÉN ── */
+.paraquien-section{
+  padding:100px 40px;
+  max-width:1100px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.paraquien-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:48px;}
+.paraquien-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:28px 24px;
+}
+.paraquien-emoji{font-size:28px;margin-bottom:16px;}
+.paraquien-titulo{font-size:16px;font-weight:500;color:var(--text);margin-bottom:8px;}
+.paraquien-desc{font-size:13px;color:var(--text2);line-height:1.65;}
+
+/* ── PRECIO ── */
+.precio-section{
+  padding:100px 40px;
+  position:relative;z-index:1;
+  text-align:center;
+}
+.precio-inner{max-width:520px;margin:0 auto;}
+.precio-box{
+  background:var(--surface);
+  border:1px solid rgba(200,169,110,.2);
+  border-radius:16px;padding:48px 40px;
+  position:relative;overflow:hidden;
+  margin-top:48px;
+}
+.precio-box::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;
+  background:radial-gradient(circle, rgba(200,169,110,.1) 0%, transparent 70%);
+}
+.precio-badge{
+  display:inline-block;background:rgba(200,169,110,.1);
+  border:1px solid rgba(200,169,110,.2);
+  color:var(--gold);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;padding:5px 14px;border-radius:20px;
+  margin-bottom:24px;
+}
+.precio-monto{
+  font-family:'Cormorant Garamond',serif;
+  font-size:72px;font-weight:300;color:var(--text);
+  line-height:1;margin-bottom:4px;
+}
+.precio-monto span{font-size:28px;color:var(--text3);vertical-align:super;}
+.precio-nota{font-size:13px;color:var(--text3);margin-bottom:32px;}
+.precio-lista{text-align:left;margin-bottom:36px;display:flex;flex-direction:column;gap:12px;}
+.precio-item{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text2);}
+.precio-item::before{content:'✓';color:var(--green);font-weight:600;flex-shrink:0;}
+.precio-cta{
+  width:100%;background:var(--gold);color:#08080a;
+  border:none;padding:18px;
+  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;
+  cursor:pointer;border-radius:4px;transition:all .25s;
+  letter-spacing:.03em;text-decoration:none;display:block;
+}
+.precio-cta:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,169,110,.25);}
+.precio-garantia{font-size:12px;color:var(--text3);margin-top:16px;}
+
+/* ── FAQ ── */
+.faq-section{
+  padding:80px 40px;
+  max-width:700px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.faq-item{border-bottom:1px solid var(--border);padding:24px 0;}
+.faq-pregunta{
+  font-size:16px;font-weight:500;color:var(--text);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;
+}
+.faq-pregunta:hover{color:var(--gold);}
+.faq-respuesta{font-size:14px;color:var(--text2);line-height:1.7;margin-top:14px;display:none;}
+.faq-respuesta.open{display:block;}
+
+/* ── FOOTER ── */
+footer{
+  padding:40px;text-align:center;
+  border-top:1px solid var(--border);
+  font-size:13px;color:var(--text3);
+  position:relative;z-index:1;
+}
+footer span{color:var(--gold);}
+
+/* ── ANIMACIONES ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .hero{padding:100px 20px 60px;}
+  .hero-stats{gap:24px;}
+  .mockup-screen{grid-template-columns:1fr;}
+  .mockup-sidebar{display:none;}
+  .features-section,.paraquien-section,.precio-section,.faq-section{padding:60px 20px;}
+  .modulos-section{padding:60px 20px;}
+  .precio-box{padding:32px 24px;}
+  .precio-monto{font-size:56px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">◈ Tablero Personal <span>by Gastón Silvetti</span></div>
+  <a class="nav-cta" href="#precio">Conseguirlo — $15 USD</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner reveal">
+    <div class="hero-tag">Sistema personal · Pago único · Sin suscripción</div>
+    <h1 class="hero-titulo">Tu vida.<br><em>Ordenada. Medida.<br>En control.</em></h1>
+    <p class="hero-sub">Un tablero completo que une tus finanzas y tu productividad en un solo lugar. Sin apps, sin suscripciones, sin límites. Tuyo para siempre.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#precio">Conseguir Tablero Personal →</a>
+      <a class="btn-secondary" href="#modulos">Ver qué incluye</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">10+</div>
+        <div class="hero-stat-label">Módulos incluidos</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">$15</div>
+        <div class="hero-stat-label">Pago único, tuyo siempre</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">0</div>
+        <div class="hero-stat-label">Suscripciones mensuales</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">∞</div>
+        <div class="hero-stat-label">Dispositivos sincronizados</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MOCKUP -->
+<div class="mockup-section reveal">
+  <div class="mockup-wrap">
+    <div class="mockup-bar">
+      <div class="mockup-dot" style="background:#ff5f57"></div>
+      <div class="mockup-dot" style="background:#febc2e"></div>
+      <div class="mockup-dot" style="background:#28c840"></div>
+      <div class="mockup-url">tablero-personal.github.io/tablero.html</div>
+    </div>
+    <div class="mockup-screen">
+      <div class="mockup-sidebar">
+        <div class="mockup-logo">◈ Tablero Personal</div>
+        <div class="mockup-nav-item on">◈ Tablero</div>
+        <div class="mockup-nav-item">◎ Mis metas</div>
+        <div class="mockup-nav-item">□ Tareas</div>
+        <div class="mockup-nav-item">◫ Calendario</div>
+        <div class="mockup-nav-section">Finanzas</div>
+        <div class="mockup-nav-item">$ Movimientos</div>
+        <div class="mockup-nav-item">▤ Mes actual</div>
+        <div class="mockup-nav-item">◧ Presupuesto</div>
+        <div class="mockup-nav-item">◉ Ahorros</div>
+      </div>
+      <div class="mockup-main">
+        <div>
+          <div class="mockup-header">Buenos días ✦</div>
+          <div class="mockup-date">Lunes, 24 de marzo de 2026</div>
+        </div>
+        <div class="mockup-cards">
+          <div class="mockup-card">
+            <div class="mockup-card-label">Metas activas</div>
+            <div class="mockup-card-val acc">5</div>
+          </div>
+          <div class="mockup-card">
+            <div class="mockup-card-label">Progreso promedio</div>
+            <div class="mockup-card-val acc">43%</div>
+          </div>
+          <div class="mockup-card">
+            <div class="mockup-card-label">Saldo del mes</div>
+            <div class="mockup-card-val pos">+$320k</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#5a5754;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Progreso de metas</div>
+          <div class="mockup-bar-item">
+            <div class="mockup-bar-label">Ahorrar fondo</div>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:50%;background:#5eb88a"></div></div>
+          </div>
+          <div class="mockup-bar-item">
+            <div class="mockup-bar-label">Leer 12 libros</div>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:25%;background:#6a9fd8"></div></div>
+          </div>
+          <div class="mockup-bar-item">
+            <div class="mockup-bar-label">Invertir 20%</div>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:30%;background:#c8a96e"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="reveal">
+    <div class="section-tag">Por qué funciona</div>
+    <h2 class="section-titulo">Todo lo que necesitás<br><em>en un solo lugar</em></h2>
+    <p class="section-sub">No más apps dispersas, planillas que no usás ni sistemas que abandonás a la semana. Un archivo, todo claro.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-item">
+      <div class="feature-icon">$</div>
+      <div class="feature-titulo">Control financiero real</div>
+      <div class="feature-desc">Registrá ingresos, gastos, ahorros y deudas. Visualizá en qué gastás, cuánto ahorrás y si vas camino a tus metas económicas.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◎</div>
+      <div class="feature-titulo">Metas con hitos</div>
+      <div class="feature-desc">Definí objetivos a corto, mediano y largo plazo. Dividílos en hitos concretos y seguí tu progreso visual mes a mes.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◧</div>
+      <div class="feature-titulo">Presupuesto vs realidad</div>
+      <div class="feature-desc">Planeá cuánto querés gastar en cada categoría y compará en tiempo real contra lo que realmente gastaste.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◉</div>
+      <div class="feature-titulo">Simulación de inversiones</div>
+      <div class="feature-desc">Calculá el crecimiento de tu plazo fijo o inversión con interés compuesto, mes a mes hasta fin de año.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">✦</div>
+      <div class="feature-titulo">Asistente IA personal</div>
+      <div class="feature-desc">Un chat que conoce tus datos reales. Preguntale cómo estás financieramente, qué priorizar esta semana o cómo mejorar tu progreso.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">☁</div>
+      <div class="feature-titulo">Sincronizado en la nube</div>
+      <div class="feature-desc">Usalo desde tu PC, celular o tablet. Todo se sincroniza automáticamente a través de Firebase gratuito.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MÓDULOS -->
+<section class="modulos-section" id="modulos">
+  <div class="modulos-inner">
+    <div class="reveal">
+      <div class="section-tag">Qué incluye</div>
+      <h2 class="section-titulo">Más de <em>10 módulos</em><br>listos para usar</h2>
+    </div>
+    <div class="modulos-grid reveal">
+      <div class="modulo-card">
+        <div class="modulo-icon">◈</div>
+        <div class="modulo-nombre">Tablero principal</div>
+        <div class="modulo-desc">Vista general de tus metas, tareas pendientes y resumen financiero del mes.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◎</div>
+        <div class="modulo-nombre">Metas e hitos</div>
+        <div class="modulo-desc">Sistema completo de objetivos con progreso automático basado en hitos completados.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">□</div>
+        <div class="modulo-nombre">Tareas</div>
+        <div class="modulo-desc">Gestión de tareas con prioridades, horarios y recordatorios del navegador.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◫</div>
+        <div class="modulo-nombre">Calendario</div>
+        <div class="modulo-desc">Eventos mensuales con vista de grilla, colores por prioridad y panel de día.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">$</div>
+        <div class="modulo-nombre">Movimientos</div>
+        <div class="modulo-desc">Registro de ingresos y gastos con categorías, filtros y formulario móvil rápido.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">▤</div>
+        <div class="modulo-nombre">Mes actual</div>
+        <div class="modulo-desc">Análisis mensual con stats, presupuesto vs real por categoría y detalle de ingresos.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">▦</div>
+        <div class="modulo-nombre">Vista anual</div>
+        <div class="modulo-desc">Tabla completa de todos los meses del año con totales por categoría.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◱</div>
+        <div class="modulo-nombre">Gráficos</div>
+        <div class="modulo-desc">Torta de distribución, ingresos vs egresos, evolución por categorías y más.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◧</div>
+        <div class="modulo-nombre">Presupuesto</div>
+        <div class="modulo-desc">Definí cuánto querés gastar en cada rubro y seguí el cumplimiento en tiempo real.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◌</div>
+        <div class="modulo-nombre">Deudas</div>
+        <div class="modulo-desc">Control de cuotas con registro de pagos reales vs teóricos y barra de progreso.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">◉</div>
+        <div class="modulo-nombre">Ahorros e inversiones</div>
+        <div class="modulo-desc">Simulación de interés compuesto con inyecciones y retiros de capital registrables.</div>
+      </div>
+      <div class="modulo-card">
+        <div class="modulo-icon">✎</div>
+        <div class="modulo-nombre">Notas diarias</div>
+        <div class="modulo-desc">Diario personal con una hoja por día, guardado automático y búsqueda por fecha.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TUTORIAL -->
+<section class="tutorial-section" id="tutorial">
+  <div class="tutorial-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="section-tag">Cómo funciona</div>
+      <h2 class="section-titulo">Explorá cada módulo<br><em>antes de comprar</em></h2>
+      <p class="section-sub" style="margin:0 auto">Hacé click en cualquier módulo para ver exactamente qué podés hacer con él.</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tut-tabs reveal">
+      <button class="tut-tab on" onclick="selTab('tablero',this)">◈ Tablero</button>
+      <button class="tut-tab" onclick="selTab('metas',this)">◎ Metas</button>
+      <button class="tut-tab" onclick="selTab('finanzas',this)">$ Finanzas</button>
+      <button class="tut-tab" onclick="selTab('presupuesto',this)">◧ Presupuesto</button>
+      <button class="tut-tab" onclick="selTab('inversiones',this)">◉ Inversiones</button>
+      <button class="tut-tab" onclick="selTab('deudas',this)">◌ Deudas</button>
+      <button class="tut-tab" onclick="selTab('ia',this)">✦ Asistente IA</button>
+    </div>
+
+    <!-- PANELS -->
+    <div class="tut-panels reveal">
+
+      <!-- TABLERO -->
+      <div class="tut-panel active" id="tut-tablero">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Dashboard principal</div>
+            <h3 class="tut-titulo">Tu situación completa<br>de un vistazo</h3>
+            <p class="tut-desc">El tablero es la primera pantalla que ves al abrir la app. En segundos sabés cómo estás con tus metas, qué tareas tenés pendientes y cómo van tus finanzas del mes.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ Insights automáticos — alertas inteligentes si superás el presupuesto o tenés metas atrasadas</div>
+              <div class="tut-feat">✓ Resumen financiero del mes con ingreso, gastos y saldo</div>
+              <div class="tut-feat">✓ Progreso de todas tus metas con barras visuales</div>
+              <div class="tut-feat">✓ Tareas del día con campo de carga rápida</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-header">
+              <div class="tmock-titulo">Buenos días, Martín ✦</div>
+              <div class="tmock-fecha">Lunes, 24 de marzo de 2026</div>
+            </div>
+            <div class="tmock-insights">
+              <div class="tmock-insight verde">✓ Vas bien con el presupuesto — 68% usado</div>
+              <div class="tmock-insight azul">◉ "Ahorrar fondo de emergencia" está al 75%</div>
+            </div>
+            <div class="tmock-stats">
+              <div class="tmock-stat"><div class="tmock-stat-l">Metas activas</div><div class="tmock-stat-v gold">5</div></div>
+              <div class="tmock-stat"><div class="tmock-stat-l">Progreso</div><div class="tmock-stat-v gold">43%</div></div>
+              <div class="tmock-stat"><div class="tmock-stat-l">Saldo del mes</div><div class="tmock-stat-v green">+$320k</div></div>
+            </div>
+            <div class="tmock-section-title">Progreso de metas</div>
+            <div class="tmock-bar-row"><span>Ahorrar fondo</span><div class="tmock-track"><div class="tmock-fill" style="width:50%;background:var(--tgreen)"></div></div><span>50%</span></div>
+            <div class="tmock-bar-row"><span>Leer 12 libros</span><div class="tmock-track"><div class="tmock-fill" style="width:25%;background:var(--tblue)"></div></div><span>25%</span></div>
+            <div class="tmock-bar-row"><span>Invertir 20%</span><div class="tmock-track"><div class="tmock-fill" style="width:30%;background:var(--tgold)"></div></div><span>30%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METAS -->
+      <div class="tut-panel" id="tut-metas">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Metas e hitos</div>
+            <h3 class="tut-titulo">De los sueños<br>a los pasos concretos</h3>
+            <p class="tut-desc">Definís tus objetivos por plazo — corto, mediano o largo — y los dividís en hitos concretos. El progreso se calcula solo a medida que tildás hitos.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ Hitos por meta — cada check avanza el porcentaje automáticamente</div>
+              <div class="tut-feat">✓ Filtros por plazo — corto, mediano y largo plazo</div>
+              <div class="tut-feat">✓ Colores personalizables por meta</div>
+              <div class="tut-feat">✓ Descripción y fecha límite por objetivo</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-meta-card" style="border-color:rgba(94,184,138,.3)">
+              <div class="tmock-meta-header"><span class="tmock-meta-nombre">Ahorrar fondo de emergencia</span><span class="tmock-plazo" style="background:rgba(94,184,138,.1);color:var(--tgreen)">Corto plazo</span></div>
+              <div class="tmock-progress-track"><div class="tmock-progress-fill" style="width:50%;background:var(--tgreen)"></div></div>
+              <div class="tmock-meta-footer"><span>50% completado</span><span>2/4 hitos</span></div>
+              <div class="tmock-hitos">
+                <div class="tmock-hito done">✓ Calcular gastos mensuales fijos</div>
+                <div class="tmock-hito done">✓ Ahorrar primer mes de reserva</div>
+                <div class="tmock-hito">○ Completar 3 meses de reserva</div>
+                <div class="tmock-hito">○ Completar 6 meses de reserva</div>
+              </div>
+            </div>
+            <div class="tmock-meta-card" style="border-color:rgba(106,159,216,.3);margin-top:10px">
+              <div class="tmock-meta-header"><span class="tmock-meta-nombre">Leer 12 libros este año</span><span class="tmock-plazo" style="background:rgba(106,159,216,.1);color:var(--tblue)">Largo plazo</span></div>
+              <div class="tmock-progress-track"><div class="tmock-progress-fill" style="width:25%;background:var(--tblue)"></div></div>
+              <div class="tmock-meta-footer"><span>25% completado</span><span>3/12 hitos</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANZAS -->
+      <div class="tut-panel" id="tut-finanzas">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Control financiero</div>
+            <h3 class="tut-titulo">Cada peso,<br>en su lugar</h3>
+            <p class="tut-desc">Registrás todos tus movimientos — ingresos, gastos, ahorros — con categoría y fecha. El mes actual te muestra el análisis completo de cómo gastaste.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ 14 categorías de gastos + 3 de ingresos</div>
+              <div class="tut-feat">✓ Vista mensual con stats de ingreso, gasto y saldo</div>
+              <div class="tut-feat">✓ Vista anual — tabla mes a mes por categoría</div>
+              <div class="tut-feat">✓ Formulario móvil para cargar gastos desde el celular en segundos</div>
+              <div class="tut-feat">✓ Gráficos: torta de distribución, ingresos vs egresos, evolución por categoría</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-fin-stats">
+              <div class="tmock-fin-stat"><div class="tmock-fin-l">Ingreso</div><div class="tmock-fin-v" style="color:var(--tgreen)">$1.500.000</div></div>
+              <div class="tmock-fin-stat"><div class="tmock-fin-l">Gastado</div><div class="tmock-fin-v" style="color:#e0604a">$1.180.000</div></div>
+              <div class="tmock-fin-stat"><div class="tmock-fin-l">Saldo</div><div class="tmock-fin-v" style="color:var(--tgreen)">+$320.000</div></div>
+            </div>
+            <div class="tmock-section-title" style="margin-top:14px">Gastos por categoría</div>
+            <div class="tmock-cat-row"><span>Casa</span><div class="tmock-track"><div class="tmock-fill" style="width:80%;background:var(--tblue)"></div></div><span>$120k</span></div>
+            <div class="tmock-cat-row"><span>Transporte</span><div class="tmock-track"><div class="tmock-fill" style="width:45%;background:var(--tblue)"></div></div><span>$68k</span></div>
+            <div class="tmock-cat-row"><span>Comida</span><div class="tmock-track"><div class="tmock-fill" style="width:60%;background:var(--tblue)"></div></div><span>$90k</span></div>
+            <div class="tmock-cat-row"><span>Ahorros</span><div class="tmock-track"><div class="tmock-fill" style="width:35%;background:var(--tgold)"></div></div><span>$150k</span></div>
+            <div class="tmock-movs">
+              <div class="tmock-mov"><span>Supermercado</span><span style="color:#e0604a">-$45.000</span></div>
+              <div class="tmock-mov"><span>Sueldo marzo</span><span style="color:var(--tgreen)">+$1.500.000</span></div>
+              <div class="tmock-mov"><span>Nafta</span><span style="color:#e0604a">-$65.000</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESUPUESTO -->
+      <div class="tut-panel" id="tut-presupuesto">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Presupuesto mensual</div>
+            <h3 class="tut-titulo">Planeá antes<br>de gastar</h3>
+            <p class="tut-desc">Fijás cuánto querés gastar en cada categoría al inicio del mes. El tablero compara en tiempo real lo que gastaste vs lo que planificaste, con barras y porcentajes.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ Presupuesto por categoría — Casa, Comida, Transporte, etc.</div>
+              <div class="tut-feat">✓ Barra de progreso por categoría — verde, amarilla o roja según el avance</div>
+              <div class="tut-feat">✓ Total presupuestado vs total gastado con saldo disponible</div>
+              <div class="tut-feat">✓ Se guarda mes a mes — no tenés que volver a cargarlo</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-section-title">Presupuesto vs Real — Marzo</div>
+            <div class="tmock-pvr"><span class="tmock-pvr-nombre">Casa</span><div class="tmock-pvr-barras"><div class="tmock-pvr-bar real" style="width:80%"></div><div class="tmock-pvr-bar presup" style="width:100%"></div></div><span class="tmock-pvr-pct ok">80%</span></div>
+            <div class="tmock-pvr"><span class="tmock-pvr-nombre">Comida</span><div class="tmock-pvr-barras"><div class="tmock-pvr-bar real" style="width:110%;background:#e0604a"></div><div class="tmock-pvr-bar presup" style="width:100%"></div></div><span class="tmock-pvr-pct over">110%</span></div>
+            <div class="tmock-pvr"><span class="tmock-pvr-nombre">Transporte</span><div class="tmock-pvr-barras"><div class="tmock-pvr-bar real" style="width:55%"></div><div class="tmock-pvr-bar presup" style="width:100%"></div></div><span class="tmock-pvr-pct ok">55%</span></div>
+            <div class="tmock-pvr"><span class="tmock-pvr-nombre">Ahorros</span><div class="tmock-pvr-barras"><div class="tmock-pvr-bar real" style="width:100%;background:var(--tgreen)"></div><div class="tmock-pvr-bar presup" style="width:100%"></div></div><span class="tmock-pvr-pct ok">100%</span></div>
+            <div class="tmock-total-card ok">
+              <div><div style="font-size:11px;opacity:.6">Total gastado vs presupuesto</div><div>$980.000 de $1.200.000</div></div>
+              <div style="text-align:right"><div style="font-size:22px;font-family:'Cormorant Garamond',serif;color:var(--tgreen)">82%</div><div style="font-size:11px;opacity:.6">$220k disponible</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVERSIONES -->
+      <div class="tut-panel" id="tut-inversiones">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Ahorros e inversiones</div>
+            <h3 class="tut-titulo">Tu plata trabajando<br>para vos</h3>
+            <p class="tut-desc">Registrás tu plazo fijo, FCI o cualquier inversión con el capital y la tasa. El tablero simula mes a mes cuánto vas a tener hasta fin de año con interés compuesto.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ Simulación de interés compuesto hasta diciembre</div>
+              <div class="tut-feat">✓ Inyecciones y retiros de capital con fecha y descripción</div>
+              <div class="tut-feat">✓ Suma el ahorro mensual del presupuesto automáticamente</div>
+              <div class="tut-feat">✓ Tabla mes a mes — capital, interés del mes y ganancia acumulada</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-inv-header">
+              <div><div class="tmock-inv-nombre">Plazo Fijo — Banco Nación</div><div style="font-size:11px;opacity:.5;margin-top:2px">TNA 90%</div></div>
+              <div style="display:flex;gap:6px">
+                <button class="tmock-btn green">+ Capital</button>
+                <button class="tmock-btn red">− Retiro</button>
+              </div>
+            </div>
+            <div class="tmock-inv-stats">
+              <div><div style="font-size:10px;opacity:.5">Capital actual</div><div style="font-size:16px;font-family:'Cormorant Garamond',serif">$1.200.000</div></div>
+              <div><div style="font-size:10px;opacity:.5">Proyectado dic</div><div style="font-size:16px;font-family:'Cormorant Garamond',serif;color:var(--tgreen)">$2.340.000</div></div>
+              <div><div style="font-size:10px;opacity:.5">Ganancia est.</div><div style="font-size:16px;font-family:'Cormorant Garamond',serif;color:var(--tgreen)">+$1.140.000</div></div>
+            </div>
+            <table class="tmock-tabla">
+              <thead><tr><th>Mes</th><th>Capital</th><th>Interés</th><th>Ganancia</th></tr></thead>
+              <tbody>
+                <tr><td>Mar</td><td>$1.290k</td><td>+$90k</td><td>+$90k</td></tr>
+                <tr><td>Abr</td><td>$1.502k</td><td>+$97k</td><td>+$187k</td></tr>
+                <tr><td>May</td><td>$1.723k</td><td>+$105k</td><td>+$292k</td></tr>
+                <tr><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                <tr style="color:var(--tgold)"><td>Dic</td><td>$2.340k</td><td>+$156k</td><td>+$1.140k</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEUDAS -->
+      <div class="tut-panel" id="tut-deudas">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Control de deudas</div>
+            <h3 class="tut-titulo">Sabé exactamente<br>cuánto debés</h3>
+            <p class="tut-desc">Cargás cada deuda con el total, la cuota teórica y las cuotas pagas. Registrás cada pago real con el monto exacto que pagaste ese mes — aunque sea distinto a la cuota teórica.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ Barra de progreso real vs teórico — dos barras por deuda</div>
+              <div class="tut-feat">✓ Registro de pagos reales con fecha, monto y nota</div>
+              <div class="tut-feat">✓ Resumen global: deuda total, pagado real, pendiente y cuota del mes</div>
+              <div class="tut-feat">✓ Historial completo de todos tus pagos por deuda</div>
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-deuda-card">
+              <div class="tmock-deuda-header"><div><div class="tmock-deuda-nombre">Tarjeta Visa</div><div style="font-size:11px;opacity:.5">4 cuotas teóricas restantes</div></div><button class="tmock-btn green" style="font-size:11px">+ Pago real</button></div>
+              <div class="tmock-deuda-stats">
+                <div><div style="font-size:10px;opacity:.5">Total deuda</div><div style="color:#e0604a">$480.000</div></div>
+                <div><div style="font-size:10px;opacity:.5">Cuota teórica</div><div>$80.000</div></div>
+                <div><div style="font-size:10px;opacity:.5">Pendiente real</div><div style="color:#e0604a">$163.000</div></div>
+              </div>
+              <div style="font-size:10px;opacity:.5;margin-bottom:4px">Pagado real</div>
+              <div class="tmock-track" style="height:7px;margin-bottom:8px"><div class="tmock-fill" style="width:66%;background:var(--tgreen)"></div></div>
+              <div style="font-size:10px;opacity:.5;margin-bottom:4px">Teórico (5/9 cuotas)</div>
+              <div class="tmock-track" style="height:7px"><div class="tmock-fill" style="width:55%;background:rgba(255,255,255,.2)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IA -->
+      <div class="tut-panel" id="tut-ia">
+        <div class="tut-layout">
+          <div class="tut-info">
+            <div class="tut-modulo-tag">Asistente IA</div>
+            <h3 class="tut-titulo">Un asesor que<br>conoce tus números</h3>
+            <p class="tut-desc">El asistente tiene acceso a todas tus metas, finanzas y tareas. Le preguntás en lenguaje natural y te responde con análisis basados en tu situación real — no consejos genéricos.</p>
+            <div class="tut-features">
+              <div class="tut-feat">✓ "¿Cómo estoy con mis finanzas este mes?"</div>
+              <div class="tut-feat">✓ "¿Cuáles son mis metas más atrasadas?"</div>
+              <div class="tut-feat">✓ "¿En qué debería enfocarme esta semana?"</div>
+              <div class="tut-feat">✓ Requiere API key de Anthropic — se configura en 2 minutos</div>
+            </div>
+            <div style="margin-top:16px;padding:12px 14px;background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.15);border-radius:8px;font-size:13px;color:#a8a49e">
+              💡 El asistente IA es opcional. El tablero funciona completo sin él.
+            </div>
+          </div>
+          <div class="tut-mockup">
+            <div class="tmock-chat">
+              <div class="tmock-msg ia"><div class="tmock-avatar">✦</div><div class="tmock-bubble ia">Hola, soy tu asistente. Tengo acceso a tus metas, finanzas y tareas. ¿En qué te ayudo?</div></div>
+              <div class="tmock-msg user"><div class="tmock-bubble user">¿Cómo estoy con mis finanzas este mes?</div><div class="tmock-avatar user">M</div></div>
+              <div class="tmock-msg ia"><div class="tmock-avatar">✦</div><div class="tmock-bubble ia">Este mes ingresaron <strong>$1.500.000</strong> y gastaste <strong>$1.180.000</strong>, lo que te deja un saldo de $320.000. Estás por debajo del presupuesto en todas las categorías excepto <strong>Comida</strong>, donde superaste el límite en $15.000. Te recomendaría ajustar esa categoría el mes que viene.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUIÉN -->
+<section class="paraquien-section" id="paraquien">
+  <div class="reveal">
+    <div class="section-tag">Para quién es</div>
+    <h2 class="section-titulo">Diseñado para personas<br><em>que quieren tomar el control</em></h2>
+  </div>
+  <div class="paraquien-grid reveal">
+    <div class="paraquien-card">
+      <div class="paraquien-emoji">💼</div>
+      <div class="paraquien-titulo">Empleados y profesionales</div>
+      <div class="paraquien-desc">Querés saber exactamente a dónde va tu sueldo, ahorrar más y tener metas claras para este año.</div>
+    </div>
+    <div class="paraquien-card">
+      <div class="paraquien-emoji">🚀</div>
+      <div class="paraquien-titulo">Freelancers y emprendedores</div>
+      <div class="paraquien-desc">Ingresos variables, múltiples proyectos y necesidad de orden. El tablero centraliza todo.</div>
+    </div>
+    <div class="paraquien-card">
+      <div class="paraquien-emoji">📈</div>
+      <div class="paraquien-titulo">Personas que invierten</div>
+      <div class="paraquien-desc">Seguís tu plazo fijo, FCI o cripto y querés simular el crecimiento con interés compuesto.</div>
+    </div>
+    <div class="paraquien-card">
+      <div class="paraquien-emoji">🎯</div>
+      <div class="paraquien-titulo">Orientados a metas</div>
+      <div class="paraquien-desc">Tenés objetivos grandes pero te cuesta mantener el seguimiento. El tablero hace que no se olviden.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIO -->
+<section class="precio-section" id="precio">
+  <div class="precio-inner">
+    <div class="reveal">
+      <div class="section-tag">Precio</div>
+      <h2 class="section-titulo">Una inversión.<br><em>Para toda la vida.</em></h2>
+    </div>
+    <div class="precio-box reveal">
+      <div class="precio-badge">Pago único — Sin renovaciones</div>
+      <div class="precio-monto"><span>USD</span> 15</div>
+      <div class="precio-nota">Precio de lanzamiento · Acceso de por vida</div>
+      <div class="precio-lista">
+        <div class="precio-item">Tablero Personal completo con 12+ módulos</div>
+        <div class="precio-item">Formulario móvil para cargar gastos rápido</div>
+        <div class="precio-item">Sincronización en la nube (Firebase gratuito)</div>
+        <div class="precio-item">Asistente IA integrado</div>
+        <div class="precio-item">Soporte para 6 monedas latinoamericanas</div>
+        <div class="precio-item">Actualizaciones incluidas para siempre</div>
+        <div class="precio-item">Guía de configuración paso a paso</div>
+      </div>
+      <a class="precio-cta" href="https://mpago.la/TU_LINK_AQUI" target="_blank">Comprar ahora — USD 15 →</a>
+      <div class="precio-garantia">Pago seguro vía Mercado Pago · Entrega inmediata por email</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="reveal">
+    <div class="section-tag">Preguntas frecuentes</div>
+    <h2 class="section-titulo" style="font-size:32px;margin-bottom:40px">Todo lo que<br><em>necesitás saber</em></h2>
+  </div>
+  <div class="reveal">
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Necesito instalar algo? <span>+</span></div>
+      <div class="faq-respuesta">No. El tablero es un archivo HTML que abrís directamente en el navegador. Sin instalaciones, sin cuentas obligatorias, sin app stores.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Funciona en el celular? <span>+</span></div>
+      <div class="faq-respuesta">Sí. Podés instalarlo como acceso directo en tu pantalla de inicio (en Chrome o Safari) y se ve como una app. Incluye un formulario móvil especial para cargar gastos rápido.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Mis datos son privados? <span>+</span></div>
+      <div class="faq-respuesta">Sí. Todo se guarda en tu propio dispositivo o en tu cuenta personal de Firebase. Nadie más tiene acceso a tus datos, ni nosotros.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Cómo sincronizo entre PC y celular? <span>+</span></div>
+      <div class="faq-respuesta">Con Firebase gratuito de Google. La guía de configuración explica cómo hacerlo en 5 pasos simples, tarda unos 10 minutos. Si no querés sincronizar, podés usarlo directo desde el archivo sin configurar nada.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Para qué países funciona? <span>+</span></div>
+      <div class="faq-respuesta">Para cualquier país hispanohablante. Al configurarlo elegís tu moneda: Peso argentino, Peso mexicano, Sol peruano, Peso chileno, Peso colombiano o Dólar.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-pregunta" onclick="toggleFaq(this)">¿Qué recibo después de pagar? <span>+</span></div>
+      <div class="faq-respuesta">Recibís por email los archivos del tablero (tablero.html y formulario.html) más una guía de configuración en PDF. La entrega es inmediata y automática.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);margin-bottom:12px">◈ Tablero Personal</div>
+  <div>Hecho con dedicación · <span>Pago único · Sin suscripciones</span></div>
+  <div style="margin-top:8px">Consultas: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="86f2e7e4eae3f4e9a8f6e3f4f5e9e8e7eaa8e7f6f6c6e1ebe7efeaa8e5e9eb">[email&#160;protected]</a></span></div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Tutorial tabs
+function selTab(id, btn){
+  document.querySelectorAll('.tut-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tut-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tut-'+id).classList.add('active');
+  btn.classList.add('on');
+}
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
+
+// FAQ toggle
+function toggleFaq(el){
+  const resp = el.nextElementSibling;
+  const span = el.querySelector('span');
+  const isOpen = resp.classList.contains('open');
+  document.querySelecto
